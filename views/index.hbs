@@ -1,12 +1,5 @@
-<h1>{{Savy Shopper}}</h1>
-<p>Welcome to {Savy shopper}</p>
+<h1>{{title}}</h1>
+<p>Welcome to {{title}}</p>
+<a href="/logout">LOG OUT</a>
 
-<a href='/movie/add' ><button>Add your profile picture</button></a>
-<section>
-  <h2>Upload your photo</h2>
-  <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="text" name="name">
-    <input type="file" name="photo">
-    <input type="submit" value="Save">
-  </form>
-</section>
+<button><a href="/auth/facebook">Login With Facebook</a></button>
