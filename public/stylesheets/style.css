@@ -54,11 +54,12 @@ a {
   width: 100px; }
 
 .error-message {
-  background: #F02B63;
+  background: #39c4ee;
   box-sizing: border-box;
+  border-radius: 25px;
   color: #fff;
   margin: 20px auto;
   padding: 20px;
-  width: 100%; }
+  width: 50%; }
 
 /*# sourceMappingURL=style.css.map */
