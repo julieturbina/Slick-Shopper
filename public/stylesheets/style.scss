@@ -51,12 +51,21 @@ a {
 }
 
 #facebookLogin {
-background-color: red;
-color: purple;
+background-color: rgb(6, 6, 232);
+color: white;
 text-align: center;
 text-decoration: none;
 border: 3px;
 border-radius: 25px;
 height: 30px;
 width: 100px;
+}
+
+.error-message {
+  background: #F02B63;
+  box-sizing: border-box;
+  color: #fff;
+  margin: 20px auto;
+  padding: 20px;
+  width: 100%;
 }

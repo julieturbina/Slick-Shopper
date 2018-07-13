@@ -3,7 +3,7 @@ const express = require("express");
 const authRoutes = express.Router();
 const passport = require("passport");
 const ensureLogin = require("connect-ensure-login");
-const flash = require("connect-flash");
+
 
 // User model
 const User = require("../models/user");
@@ -12,51 +12,96 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const bcryptSalt = 10;
 
-//facebook
+// facebook login start
+
 authRoutes.get("/auth/facebook", passport.authenticate("facebook"));
 authRoutes.get("/auth/facebook/callback", passport.authenticate("facebook", {
   successRedirect: "/private-page",
   failureRedirect: "/"
 }));
 
-authRoutes.get("/logout", (req, res) => {
-    req.logout();
-    res.redirect("/login");
+// facebook login end
+
+// google login start
+
+authRoutes.get("/auth/google", passport.authenticate("google", {
+    scope: ["https://www.googleapis.com/auth/plus.login",
+            "https://www.googleapis.com/auth/plus.profile.emails.read"]
+  }));
+  
+  authRoutes.get("/auth/google/callback", passport.authenticate("google", {
+    failureRedirect: "/",
+    successRedirect: "/private-page"
+  }));
+
+// google login end
+
+  authRoutes.get("/logout", (req, res, next) => {
+    req.session.destroy((err) => {
+      // cannot access session here
+      res.redirect("/login");
+    });
   });
 
 authRoutes.get("/private-page", ensureLogin.ensureLoggedIn(), (req, res) => {
     res.render("private", { user: req.user });
   });
+ 
+  authRoutes.get("/login", (req, res, next) => {
+    res.render("auth/login");
+  });
 
-
-authRoutes.get("/login", (req, res, next) => {
-    res.render("auth/login", { "message": req.flash("error") });
-});
+  authRoutes.post("/login", (req, res, next) => {
+    const username = req.body.username;
+    const password = req.body.password;
   
-authRoutes.post("/login", passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/login",
-    failureFlash: true,
-    passReqToCallback: true
-}));
+    if (username === "" || password === "") {
+      res.render("auth/login", {
+        errorMessage: "Enter a username and a password to sign up"
+      });
+      return;
+    }
+  
+    User.findOne({ "username": username }, (err, user) => {
+        if (err || !user) {
+          res.render("auth/login", {
+            errorMessage: "Username doesn't exist, plese sign up"
+          });
+          return;
+        }
+        if (bcrypt.compareSync(password, user.password)) {
+          // Save the login in the session!
+          req.session.currentUser = user;
+          res.redirect("/");
+        } else {
+          res.render("auth/login", {
+            errorMessage: "Incorrect password"
+          });
+        }
+    });
+  });
+
 
 authRoutes.get("/signup", (req, res, next) => {
   res.render("auth/signup");
 });
 
 authRoutes.post("/signup", (req, res, next) => {
-  const username = req.body.username;
+  const useraname = req.body.username;
   const password = req.body.password;
 
   if (username === "" || password === "") {
-    res.render("auth/signup", { message: "Indicate username and password" });
+    res.render("auth/signup", { 
+      eerrorMessage: "Enter username and password to sign up" });
     return;
   }
 
-  User.findOne({ username })
-  .then(user => {
-    if (user !== null) {
-      res.render("auth/signup", { message: "The username already exists" });
+  User.findOne({ "username": username })
+.then(user => {
+  if (user !== null) {
+      res.render("auth/signup", {
+        errorMessage: "The username already exists"
+      });
       return;
     }
 
@@ -68,14 +113,20 @@ authRoutes.post("/signup", (req, res, next) => {
       password: hashPass
     });
 
-    newUser.save((err) => {
-      if (err) {
-        res.render("auth/signup", { message: "Something went wrong" });
-      } else {
-        res.redirect("/");
-      }
+    newUser.save()
+    .then(user => {
+      res.redirect("/");
     });
-  })
+})
+    // newUser.save((err) => {
+    //   if (err) {
+    //     res.render("auth/signup", { message: "Error, please retry" });
+    //   } else {
+    //     res.redirect("/");
+    //   }
+    // });
+  // })
+  
   .catch(error => {
     next(error);
   });

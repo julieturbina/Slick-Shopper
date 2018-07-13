@@ -1,6 +1,7 @@
 // models/user.js
 const mongoose = require("mongoose");
 const Schema   = mongoose.Schema;
+
 //login with facebook below
 const userSchema = new Schema({
   username: String,
