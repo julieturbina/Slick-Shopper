@@ -11,7 +11,7 @@ const mongoose     = require('mongoose');
 const logger       = require('morgan');
 const path         = require('path');
 const index = require('./routes/index');
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth-routes');
 const socialiteRoutes = require('./routes/socialite');
 
   const bcrypt       = require("bcrypt");
@@ -38,7 +38,7 @@ console.log("Hash 2 -", hash2);
 // bcrypt end ========================================
 mongoose.Promise = Promise;
 mongoose
-  .connect('mongodb://localhost/socialite', {useMongoClient: true})
+  .connect('mongodb://localhost/Socialite', {useMongoClient: true})
   .then(() => {
     console.log('Connected to Mongo!');
   }).catch(err => {
@@ -57,7 +57,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-  secret: "the-socialite-app",
+  secret: "Socialite",
   resave: true,
   saveUninitialized: true,
   cookie: { maxAge: 600000000 },

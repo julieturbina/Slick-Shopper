@@ -1,6 +1,6 @@
 const express    = require("express");
-const User = require('../models/user');
-const ClientConsult = require('../models/client');
+const Provider = require('../models/provider.js');
+const Services = require('../models/services.js');
 
 const router = express.Router();
 
@@ -14,15 +14,15 @@ res.redirect('/login');
 
 router.get('/dashboard', (req, res, next) => {
   let query;
-  if (req.session.currentUser.isClient) {
+  if (req.session.currentUser.isProvider) {
   query = { client: req.session.currentUser._id };
   } else {
   query = { user: req.session.currentUser._id };
   }
   ClientConsultation
   .find(query)
-  .populate('user', 'name')
-  .populate('client', 'name')
+  .populate('provider', 'name')
+  .populate('services', 'name')
   .sort('consultationDate')
   .exec((err, pickupDocs) => {
   if (err) {
